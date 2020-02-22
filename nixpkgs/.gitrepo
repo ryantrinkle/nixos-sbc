@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:NixOS/nixpkgs-channels
+	branch = nixos-19.09-small
+	commit = e9ef090eb54a8c13658f701c403c23cc108d7bc0
+	parent = 30ac97dc768c6d3e4a938d48630aac46eb693d13
+	method = merge
+	cmdver = 0.4.0

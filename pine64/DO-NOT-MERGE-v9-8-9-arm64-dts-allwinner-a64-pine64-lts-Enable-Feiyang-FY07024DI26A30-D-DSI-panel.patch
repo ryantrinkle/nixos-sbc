@@ -1,0 +1,184 @@
+From patchwork Wed May 29 10:56:14 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Jagan Teki <jagan@amarulasolutions.com>
+X-Patchwork-Id: 10966801
+Return-Path: <dri-devel-bounces@lists.freedesktop.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 13EE8112C
+	for <patchwork-dri-devel@patchwork.kernel.org>;
+ Wed, 29 May 2019 10:57:21 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 05A602886A
+	for <patchwork-dri-devel@patchwork.kernel.org>;
+ Wed, 29 May 2019 10:57:21 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id EE1A0288E0; Wed, 29 May 2019 10:57:20 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-5.2 required=2.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	RCVD_IN_DNSWL_MED autolearn=ham version=3.3.1
+Received: from gabe.freedesktop.org (gabe.freedesktop.org [131.252.210.177])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTPS id 9F14A2886A
+	for <patchwork-dri-devel@patchwork.kernel.org>;
+ Wed, 29 May 2019 10:57:20 +0000 (UTC)
+Received: from gabe.freedesktop.org (localhost [127.0.0.1])
+	by gabe.freedesktop.org (Postfix) with ESMTP id CF8C06E2B8;
+	Wed, 29 May 2019 10:57:19 +0000 (UTC)
+X-Original-To: dri-devel@lists.freedesktop.org
+Delivered-To: dri-devel@lists.freedesktop.org
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com
+ [IPv6:2607:f8b0:4864:20::643])
+ by gabe.freedesktop.org (Postfix) with ESMTPS id 1A5F86E2B8
+ for <dri-devel@lists.freedesktop.org>; Wed, 29 May 2019 10:57:18 +0000 (UTC)
+Received: by mail-pl1-x643.google.com with SMTP id a5so896142pls.12
+ for <dri-devel@lists.freedesktop.org>; Wed, 29 May 2019 03:57:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=6DwmkLGpJZpkcPw0XMVVDkf1y0K009QPRSW8hUfXBRY=;
+ b=LswpKVUSE12cIy3FODNYISdgGuz92FfBSja4cOAFoxdAurdL+OM1aRoyMtdB3sUSdG
+ OsuTbI0NU/Au6+ulkr22keBe0L8BbjZgs24iNYEMVooH3Up97JGsUjDxnoWWzVh5FD+O
+ i7MylTRmAj18Mzxj6IKd5l/oDoiv5bJ/mk6e3puKgzfSNaQNoGOFb43ogb9xgLmIZ8XM
+ l5Idbbs7knzjAQinIlvccYLxSp5xiSAhnoBNgwyOmhNgusTZRihg9DLvADuw2O+FGV/3
+ bioTc0LkMX/uZLi4+cM3ii/coXnVq5aXgR9jMNWBUtNjm91dz2Zlo2W3jV3DAaQGR1Gu
+ 2K1Q==
+X-Gm-Message-State: APjAAAXuiqlSUctNIHvCuQ9jgLHRmfpjRPB0GGoIHbDXyGZOJJakqCBn
+ 0jVPVULXzjnAwTpT2lmwBYfITA==
+X-Google-Smtp-Source: 
+ APXvYqwygLxq0inFrDqP1GBEA4oJIXO+O1N08+R0LPi1oqe2Amq7V89w6a/dgny0hRfvq1CVA26PnA==
+X-Received: by 2002:a17:902:20eb:: with SMTP id
+ v40mr15879742plg.239.1559127437024;
+ Wed, 29 May 2019 03:57:17 -0700 (PDT)
+Received: from localhost.localdomain ([49.206.202.218])
+ by smtp.gmail.com with ESMTPSA id 184sm18974479pfa.48.2019.05.29.03.57.12
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 29 May 2019 03:57:16 -0700 (PDT)
+From: Jagan Teki <jagan@amarulasolutions.com>
+To: Maxime Ripard <maxime.ripard@bootlin.com>,
+ David Airlie <airlied@linux.ie>,
+ Daniel Vetter <daniel@ffwll.ch>, Chen-Yu Tsai <wens@csie.org>,
+ dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Subject: [DO NOT MERGE] [PATCH v9 8/9] arm64: dts: allwinner: a64-pine64-lts:
+ Enable Feiyang FY07024DI26A30-D DSI panel
+Date: Wed, 29 May 2019 16:26:14 +0530
+Message-Id: <20190529105615.14027-9-jagan@amarulasolutions.com>
+X-Mailer: git-send-email 2.18.0.321.gffc6fa0e3
+In-Reply-To: <20190529105615.14027-1-jagan@amarulasolutions.com>
+References: <20190529105615.14027-1-jagan@amarulasolutions.com>
+MIME-Version: 1.0
+X-Mailman-Original-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amarulasolutions.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=6DwmkLGpJZpkcPw0XMVVDkf1y0K009QPRSW8hUfXBRY=;
+ b=VFu9w0hD1Ourpd8eMMh8PYNciyswgOS1KtrgHUdk0KAmbBdup7r3OzJtKsKMtdN0BH
+ 5AS3DuAId2PTW+ttuh2IAHVuA7mZ2XxF6MgB1mm9oABWptM+8bobX3Dwxul01VlpKDoS
+ gSnWhBuTO1Skk4JqIA12yvsaam3Xpv9pnZMN0=
+X-BeenThere: dri-devel@lists.freedesktop.org
+X-Mailman-Version: 2.1.23
+Precedence: list
+List-Id: Direct Rendering Infrastructure - Development
+ <dri-devel.lists.freedesktop.org>
+List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+Cc: devicetree@vger.kernel.org, Ryan Pannell <ryan@osukl.com>,
+ bshah@mykolab.com, linux-sunxi@googlegroups.com,
+ Jagan Teki <jagan@amarulasolutions.com>,
+ Michael Trimarchi <michael@amarulasolutions.com>,
+ linux-amarula@amarulasolutions.com, Sergey Suloev <ssuloev@orpaltech.com>
+Errors-To: dri-devel-bounces@lists.freedesktop.org
+Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+Feiyang FY07024DI26A30-D MIPI_DSI panel is desiged to attach with
+DSI connector on pine64 boards, enable the same for pine64 LTS.
+
+DSI panel connected via board DSI port with,
+- DLDO1 as VCC-DSI supply
+- DC1SW as AVDD supply
+- DLDO2 as DVDD supply
+- PD24 gpio for reset pin
+- PH10 gpio for backlight enable pin
+
+Tested-by: Merlijn Wajer <merlijn@wizzup.org>
+Signed-off-by: Jagan Teki <jagan@amarulasolutions.com>
+---
+ .../allwinner/sun50i-a64-sopine-baseboard.dts | 31 +++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+index e6fb9683f213..51b0cf71c3d4 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+@@ -46,6 +46,7 @@
+ /dts-v1/;
+ 
+ #include "sun50i-a64-sopine.dtsi"
++#include <dt-bindings/pwm/pwm.h>
+ 
+ / {
+ 	model = "SoPine with baseboard";
+@@ -61,6 +62,14 @@
+ 		stdout-path = "serial0:115200n8";
+ 	};
+ 
++	backlight: backlight {
++		compatible = "pwm-backlight";
++		pwms = <&r_pwm 0 50000 PWM_POLARITY_INVERTED>;
++		brightness-levels = <1 2 4 8 16 32 64 128 255>;
++		default-brightness-level = <8>;
++		enable-gpios = <&pio 7 10 GPIO_ACTIVE_HIGH>; /* LCD-BL-EN: PH10 */
++	};
++
+ 	hdmi-connector {
+ 		compatible = "hdmi-connector";
+ 		type = "a";
+@@ -104,6 +113,24 @@
+ 	status = "okay";
+ };
+ 
++&dphy {
++	status = "okay";
++};
++
++&dsi {
++	vcc-dsi-supply = <&reg_dldo1>;		/* VCC-DSI */
++	status = "okay";
++
++	panel@0 {
++		compatible = "feiyang,fy07024di26a30d";
++		reg = <0>;
++		avdd-supply = <&reg_dc1sw>;	/* VCC-LCD */
++		dvdd-supply = <&reg_dldo2>;	/* VCC-MIPI */
++		reset-gpios = <&pio 3 24 GPIO_ACTIVE_HIGH>; /* LCD-RST: PD24 */
++		backlight = <&backlight>;
++	};
++};
++
+ &ehci0 {
+ 	status = "okay";
+ };
+@@ -184,6 +211,10 @@
+ 	vcc-hdmi-supply = <&reg_dldo1>;
+ };
+ 
++&r_pwm {
++	status = "okay";
++};
++
+ &sound {
+ 	simple-audio-card,aux-devs = <&codec_analog>;
+ 	simple-audio-card,widgets = "Microphone", "Microphone Jack",

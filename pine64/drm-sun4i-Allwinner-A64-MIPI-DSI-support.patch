@@ -1,0 +1,1418 @@
+From patchwork Sun Dec 22 13:22:23 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Jagan Teki <jagan@amarulasolutions.com>
+X-Patchwork-Id: 11307441
+Return-Path: 
+ <SRS0=r43V=2M=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id C229F159A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:29:42 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FD8E2063A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:29:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="KCcheQXK";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=amarulasolutions.com header.i=@amarulasolutions.com
+ header.b="CrIi6L/+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FD8E2063A
+Authentication-Results: mail.kernel.org;
+ dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=BAxWVqcuzEZsG7W5xjD7k+S69cJ4RZWwnZvqIaXmqqw=; b=KCcheQXKM0ZH14
+	cW9dPIL/txb8DiAawePYuKUVUtDt0dv2u/ze37W0uBE3L5uW9lqEwCw3gNSlcj/4fx8R9HjS/Jb3q
+	p4U7ch7lo1vqrH9XUNEBRt4Cd+84eudvu9NGCaV9PMQfzoz6VJ0TcB4VMmw3SZB60+13XlGf2Z/KB
+	WxiPSuHkHkNmMNL+IN8EIptVDcqi+fFF/m6afMyXKX915Le03tE1YNdgJO7+InFkPD+ntFHYiCmFE
+	u58oE6efTAZ6gWJd9YNJj8k9RkE00/pZ5GpM2mbhdMq5doaNMSFuG9zZqmhN+WUVa7xeU0R0jPl8h
+	nsQWk7O0zf41/80lEA/g==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92.3 #3 (Red Hat Linux))
+	id 1ij1Ii-0003Tc-LK; Sun, 22 Dec 2019 13:29:40 +0000
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042])
+ by bombadil.infradead.org with esmtps (Exim 4.92.3 #3 (Red Hat Linux))
+ id 1ij1Ia-0003LC-19
+ for linux-arm-kernel@lists.infradead.org; Sun, 22 Dec 2019 13:29:33 +0000
+Received: by mail-pj1-x1042.google.com with SMTP id d5so6248020pjz.5
+ for <linux-arm-kernel@lists.infradead.org>;
+ Sun, 22 Dec 2019 05:29:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amarulasolutions.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=yZ8n1dFGNqx9MjMWepdptN60E7TYxz6HFWUIoiztPpA=;
+ b=CrIi6L/++ZVUaxwSl7hMrcWzqn+AgARP/aDXgQhVDwayW9WwQjGIHVxOKVjmIs/LRU
+ xRuzF+iEeSKXzPJ+uOS+jjwNozOdDnDRYA7/uQFxKE42sPXGKDftuDxi7JKTOTmROyrf
+ laM6qMlWuFedzbEVUgqszL/8rFagkferTXcG8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=yZ8n1dFGNqx9MjMWepdptN60E7TYxz6HFWUIoiztPpA=;
+ b=gbZc1xWA9cqPA0NBVGMCzixK0zjl29mi26XkQXQSIRz71Z80GINIq1G818g2Tezl2K
+ nRk5Ovh/4qBU5tUbUjJiPEgdKsGfQ4fQ7+VwSB7ueTGpJgZsHFlNAKP8I212BlEB5PHF
+ CKJk/1pGM+W6H3UXGjcB9IUbynIxAW7Ag6XZEC2CRTLzS+ohoZ657Ux6i3/msr3W2c7w
+ kgChm4H1I9/Buc6emO4ipFnJfB1MU09xe0WeN44+iz6ujwS2gfXOqcBLbggWExndrS05
+ 6nG2fyqQbPhuD9NBTmAaW5k/j3xcAyh0UPtaW41n+vKhlPD9mZs6flKMj+dPASdwoQ07
+ b/nA==
+X-Gm-Message-State: APjAAAW9oQbkRds84XbEmhAdd5Z+No7PvCXtMSzXntJvtlI1+ifLdVoX
+ mU3dkrKDghrEjngQsQnNgBPkGQ==
+X-Google-Smtp-Source: 
+ APXvYqx8VhsvVjyJ4/Sp6CH68k0bIUCH7wuk1lY1KWY5L9o3lzkZKagxgPGCiUmA9dsys23cSvHb8g==
+X-Received: by 2002:a17:90a:9c1:: with SMTP id
+ 59mr28516972pjo.65.1577021370933;
+ Sun, 22 Dec 2019 05:29:30 -0800 (PST)
+Received: from localhost.localdomain ([49.206.202.16])
+ by smtp.gmail.com with ESMTPSA id o2sm12073058pjo.26.2019.12.22.05.29.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 22 Dec 2019 05:29:30 -0800 (PST)
+From: Jagan Teki <jagan@amarulasolutions.com>
+To: Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ David Airlie <airlied@linux.ie>, Daniel Vetter <daniel@ffwll.ch>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v14 1/7] dt-bindings: sun6i-dsi: Document A64 MIPI-DSI
+ controller
+Date: Sun, 22 Dec 2019 18:52:23 +0530
+Message-Id: <20191222132229.30276-2-jagan@amarulasolutions.com>
+X-Mailer: git-send-email 2.18.0.321.gffc6fa0e3
+In-Reply-To: <20191222132229.30276-1-jagan@amarulasolutions.com>
+References: <20191222132229.30276-1-jagan@amarulasolutions.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20191222_052932_069418_00C53154 
+X-CRM114-Status: GOOD (  11.30  )
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-sunxi <linux-sunxi@googlegroups.com>,
+ Jagan Teki <jagan@amarulasolutions.com>, michael@amarulasolutions.com,
+ linux-amarula@amarulasolutions.com, linux-arm-kernel@lists.infradead.org,
+ Icenowy Zheng <icenowy@aosc.io>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+
+The MIPI DSI controller in Allwinner A64 is similar to A33.
+
+But unlike A33, A64 doesn't have DSI_SCLK gating so it is valid
+to have separate compatible for A64 on the same driver.
+
+DSI_SCLK uses mod clock-names on dt-bindings, so the same
+is not required for A64.
+
+On that note
+- A64 require minimum of 1 clock like the bus clock
+- A33 require minimum of 2 clocks like both bus, mod clocks
+
+So, update dt-bindings so-that it can document both A33,
+A64 bindings requirements.
+
+Reviewed-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Jagan Teki <jagan@amarulasolutions.com>
+---
+Changes for v14:
+- none
+
+ .../display/allwinner,sun6i-a31-mipi-dsi.yaml | 33 +++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml b/Documentation/devicetree/bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml
+index dafc0980c4fa..d41ecb5e7f7c 100644
+--- a/Documentation/devicetree/bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml
++++ b/Documentation/devicetree/bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml
+@@ -15,7 +15,9 @@ properties:
+   "#size-cells": true
+ 
+   compatible:
+-    const: allwinner,sun6i-a31-mipi-dsi
++    enum:
++      - allwinner,sun6i-a31-mipi-dsi
++      - allwinner,sun50i-a64-mipi-dsi
+ 
+   reg:
+     maxItems: 1
+@@ -24,6 +26,8 @@ properties:
+     maxItems: 1
+ 
+   clocks:
++    minItems: 1
++    maxItems: 2
+     items:
+       - description: Bus Clock
+       - description: Module Clock
+@@ -63,13 +67,38 @@ required:
+   - reg
+   - interrupts
+   - clocks
+-  - clock-names
+   - phys
+   - phy-names
+   - resets
+   - vcc-dsi-supply
+   - port
+ 
++allOf:
++  - if:
++      properties:
++         compatible:
++           contains:
++             const: allwinner,sun6i-a31-mipi-dsi
++
++    then:
++        properties:
++          clocks:
++            minItems: 2
++
++        required:
++          - clock-names
++
++  - if:
++      properties:
++         compatible:
++           contains:
++             const: allwinner,sun50i-a64-mipi-dsi
++
++    then:
++        properties:
++          clocks:
++            minItems: 1
++
+ additionalProperties: false
+ 
+ examples:
+
+From patchwork Sun Dec 22 13:22:24 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Jagan Teki <jagan@amarulasolutions.com>
+X-Patchwork-Id: 11307451
+Return-Path: 
+ <SRS0=r43V=2M=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id D1DC2109A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:30:00 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id AFED9208C3
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:30:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="jJyfLxDr";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=amarulasolutions.com header.i=@amarulasolutions.com
+ header.b="lB4V4tgg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFED9208C3
+Authentication-Results: mail.kernel.org;
+ dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=kRRLb4qPpNDDvHXbdPWgYPZz0HLcAB5+uVr/TbAvr4c=; b=jJyfLxDrK+Y/Cn
+	ONUijERszepolxQBDW79FGGv4oHqGROOSOczGqHw1HU7EoGmsiAkjvWLwdRtEwXvOIqOZ9TgWzbD1
+	m1v8IeYODyRCEkQ4CXfbNU5YrGdtFGi2lBldPA84FssOSIxwemsPNTEtvKrapSL0JK+N1Dk+YECWJ
+	xQjrDSzOnCAtkAPxODXR5+gXbrMUZP1KYwoHthHlCT1kUeui3l2LE7m0vxjTCQ6b+CRdI1De0yoXK
+	ouWe3HdDJmeMBAH56+FHGPjQE/9MXS5efRhWfuRKHNM+T8dmbXV3AVtmu3XLwHWG3g6JowpD1FQce
+	dNgMjwdfAYwjqtGwXIcQ==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92.3 #3 (Red Hat Linux))
+	id 1ij1J0-0003ld-Vo; Sun, 22 Dec 2019 13:29:58 +0000
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041])
+ by bombadil.infradead.org with esmtps (Exim 4.92.3 #3 (Red Hat Linux))
+ id 1ij1Ie-0003Oz-Qi
+ for linux-arm-kernel@lists.infradead.org; Sun, 22 Dec 2019 13:29:38 +0000
+Received: by mail-pj1-x1041.google.com with SMTP id s94so5038841pjc.1
+ for <linux-arm-kernel@lists.infradead.org>;
+ Sun, 22 Dec 2019 05:29:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amarulasolutions.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=KhD44eBjciixBbXS0jbewwrbs2b2OiqLmvbXkaKHo00=;
+ b=lB4V4tgg9XJchkZsFP26liTLrD5wSsSFIAEJ32qjq+iAwPpa8KAOLT+EVxcmw1pwYK
+ WMckdTBx4XBA2jV1zAMUZl7P6mpT+gvrq67YYby5w8wExWSzt8Nz7CRKG/z/R4vuRF6+
+ shHJH9AM/F2G+LyXB5Hw4yotlUHH1pZsM8UDM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=KhD44eBjciixBbXS0jbewwrbs2b2OiqLmvbXkaKHo00=;
+ b=WD+93m6RUz/flNkB7o+Umml8IX1vSUydo01xl/GWN1ZiZJdMDqRyVjQQOKRnGSVPSq
+ Ulyx24eyScD69W6GCDeHeI7fzO7k/jeQbHMcHEvShs9UqBsC7AOaR6q6TWkcIT1poz6Q
+ /ow1EBOUBww/7exWqM2KwxDCbU3R8L4SjDuCeWjiQ8t2jtu9rhZ6WcOHjs7xoUTWSbNi
+ OeSOBf/E1CYha+w2scy7PLrzW2z03IT2KL5hHKZlGN0jL1a6yOMO3wazLkHT/Iyh1iFx
+ LL7KbjvXEAtD0vU7UAAGG/G4EP2kt7lE6mlx2qOQHESAXu52glmbTHZJB9VfKTA11JKb
+ CArg==
+X-Gm-Message-State: APjAAAXYPPZq1uDy2qDkYzCLQVrWWp6WZ26ELwWlLlngKqwDRX8ysgye
+ e1eiBdxeC25Y5mKVu+cA6prKmQ==
+X-Google-Smtp-Source: 
+ APXvYqzVvyqaDb1iAdI2rOGho/ufZoqSGILukc81YMHL6NVkze8m/8RkPnz08yfklmZh9CKXZYH2lw==
+X-Received: by 2002:a17:902:74cb:: with SMTP id
+ f11mr24895957plt.139.1577021375724;
+ Sun, 22 Dec 2019 05:29:35 -0800 (PST)
+Received: from localhost.localdomain ([49.206.202.16])
+ by smtp.gmail.com with ESMTPSA id o2sm12073058pjo.26.2019.12.22.05.29.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 22 Dec 2019 05:29:35 -0800 (PST)
+From: Jagan Teki <jagan@amarulasolutions.com>
+To: Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ David Airlie <airlied@linux.ie>, Daniel Vetter <daniel@ffwll.ch>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v14 2/7] dt-bindings: sun6i-dsi: Add A64 DPHY compatible (w/
+ A31 fallback)
+Date: Sun, 22 Dec 2019 18:52:24 +0530
+Message-Id: <20191222132229.30276-3-jagan@amarulasolutions.com>
+X-Mailer: git-send-email 2.18.0.321.gffc6fa0e3
+In-Reply-To: <20191222132229.30276-1-jagan@amarulasolutions.com>
+References: <20191222132229.30276-1-jagan@amarulasolutions.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20191222_052936_898741_17D76F8E 
+X-CRM114-Status: GOOD (  11.05  )
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-sunxi <linux-sunxi@googlegroups.com>,
+ Jagan Teki <jagan@amarulasolutions.com>, michael@amarulasolutions.com,
+ linux-amarula@amarulasolutions.com, linux-arm-kernel@lists.infradead.org,
+ Icenowy Zheng <icenowy@aosc.io>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+
+The MIPI DSI PHY controller on Allwinner A64 is similar
+on the one on A31.
+
+Add A64 compatible and append A31 compatible as fallback.
+
+Reviewed-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Jagan Teki <jagan@amarulasolutions.com>
+---
+Changes for v14:
+- none
+
+ .../bindings/phy/allwinner,sun6i-a31-mipi-dphy.yaml         | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/phy/allwinner,sun6i-a31-mipi-dphy.yaml b/Documentation/devicetree/bindings/phy/allwinner,sun6i-a31-mipi-dphy.yaml
+index fa46670de299..8841938050b2 100644
+--- a/Documentation/devicetree/bindings/phy/allwinner,sun6i-a31-mipi-dphy.yaml
++++ b/Documentation/devicetree/bindings/phy/allwinner,sun6i-a31-mipi-dphy.yaml
+@@ -15,7 +15,11 @@ properties:
+     const: 0
+ 
+   compatible:
+-    const: allwinner,sun6i-a31-mipi-dphy
++    oneOf:
++      - const: allwinner,sun6i-a31-mipi-dphy
++      - items:
++          - const: allwinner,sun50i-a64-mipi-dphy
++          - const: allwinner,sun6i-a31-mipi-dphy
+ 
+   reg:
+     maxItems: 1
+
+From patchwork Sun Dec 22 13:22:25 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Jagan Teki <jagan@amarulasolutions.com>
+X-Patchwork-Id: 11307455
+Return-Path: 
+ <SRS0=r43V=2M=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 46D99109A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:30:30 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id 23F262070A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:30:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="FzGpqdIF";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=amarulasolutions.com header.i=@amarulasolutions.com
+ header.b="dNOsofgd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23F262070A
+Authentication-Results: mail.kernel.org;
+ dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=20gSg9yZ+BssJawXQB30ZtoEkWWNh351j+Uyp8L4OLI=; b=FzGpqdIFhVES8I
+	MEtJNL6/AFsCVpGzpJUyQKGS3m1R3tx/SvXF71xfxs5p8TyikPFp9u83wiZDxHnmTM7dhr7ipvCfX
+	zWezdI8rg+S+nvJMpCtINwbJSn+Xf2GBF+LqaEq8gnPwNvPbk6969QStWd8ioE7ugCEEV5SufTfMS
+	5ze9ZdajyeFhUchxn3vX91PDmvnahad6INtCmInlzpvVpFRYFDYYP5k92Z6yo72qpz/W3k+Z15kR+
+	QVWBW49zw1fTYLYE8PKu6bHXVF7/3rleV9JFMMCtvkW1cjF8IffpKGZYe22YfZ99/NnKgdBn0u4md
+	qFVl1tvM/T8pGj9f5DtQ==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92.3 #3 (Red Hat Linux))
+	id 1ij1JV-0005Hq-MN; Sun, 22 Dec 2019 13:30:29 +0000
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041])
+ by bombadil.infradead.org with esmtps (Exim 4.92.3 #3 (Red Hat Linux))
+ id 1ij1Ij-0003UX-Hl
+ for linux-arm-kernel@lists.infradead.org; Sun, 22 Dec 2019 13:29:43 +0000
+Received: by mail-pj1-x1041.google.com with SMTP id t101so6272985pjb.4
+ for <linux-arm-kernel@lists.infradead.org>;
+ Sun, 22 Dec 2019 05:29:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amarulasolutions.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=NRAz4ZoqKI0Nd9TLnyy5Bof8VE4wzHjzOviJFUDWFYU=;
+ b=dNOsofgdHJWSE8kXto64TSNFpxvXSvTZtOGMWYtrAbWMsEWHOWfyZJKTWKxhM/tWbM
+ AzxWaWz0PjEHFhYXmk9MIjDaDM8CUit4sGy/NLqKXDZxAxfI5cQfx55rk7JCf61gEnsQ
+ 6XQLOI6jPwnXWXY7UFUUb9Fhteq4HIuQHSf8w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=NRAz4ZoqKI0Nd9TLnyy5Bof8VE4wzHjzOviJFUDWFYU=;
+ b=l5D7+U07InNuy8GLSK79ZRiA/MubxlWoUc4gfUhpjiJL9DD7OULx6oSIJ4N/Z3qnji
+ S+LNBCuWor2vFEvDFA6d9eeGbM2LuC6eZpLmEDxbKKt8II2PbtfpbNYOwde4N4VQY+AF
+ nGMsbdwVKOMtDiTbV5pgbIOfVcktDqFLudjAiEsMh2AfZXAa9REU/05o/xHWc1BA5Vds
+ 99acUMx7T8IbUg+dhJuGGqqI9n1+GKsQgRw9oQCJFNLaJzwhOgcLZlCuUHZbh/wqfOFJ
+ +fUmD2t05CNxNgO38i4olU714I9XMIZONreyLB4L+BIyLN3cpOJbYNDPhoKh2XPbDIpN
+ 9toA==
+X-Gm-Message-State: APjAAAVDWRPpwppGfl8NooYoHj/K64gAk5qOQSExdqD0GvCx8s9dgSl6
+ BpZSVN7CAuJ2Fv/QuvCxeUDHoA==
+X-Google-Smtp-Source: 
+ APXvYqzi7D0b+20qvpHdXr2HAOx7HQsXtaHE5dZtjtMXAPfngax/iDdiCqnpwtaqArWonhyBKuzS1A==
+X-Received: by 2002:a17:90a:a4c4:: with SMTP id
+ l4mr27148361pjw.48.1577021380573;
+ Sun, 22 Dec 2019 05:29:40 -0800 (PST)
+Received: from localhost.localdomain ([49.206.202.16])
+ by smtp.gmail.com with ESMTPSA id o2sm12073058pjo.26.2019.12.22.05.29.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 22 Dec 2019 05:29:40 -0800 (PST)
+From: Jagan Teki <jagan@amarulasolutions.com>
+To: Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ David Airlie <airlied@linux.ie>, Daniel Vetter <daniel@ffwll.ch>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v14 3/7] drm/sun4i: dsi: Get the mod clock for A31
+Date: Sun, 22 Dec 2019 18:52:25 +0530
+Message-Id: <20191222132229.30276-4-jagan@amarulasolutions.com>
+X-Mailer: git-send-email 2.18.0.321.gffc6fa0e3
+In-Reply-To: <20191222132229.30276-1-jagan@amarulasolutions.com>
+References: <20191222132229.30276-1-jagan@amarulasolutions.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20191222_052941_624540_72C38410 
+X-CRM114-Status: GOOD (  13.59  )
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-sunxi <linux-sunxi@googlegroups.com>,
+ Jagan Teki <jagan@amarulasolutions.com>, michael@amarulasolutions.com,
+ linux-amarula@amarulasolutions.com, linux-arm-kernel@lists.infradead.org,
+ Icenowy Zheng <icenowy@aosc.io>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+
+As per the user manual, look like mod clock is not mandatory
+for all Allwinner MIPI DSI controllers, it is connected to
+CLK_DSI_SCLK for A31 and not available in A64.
+
+So, add compatible check for A31 and get mod clock accordingly.
+
+Tested-by: Merlijn Wajer <merlijn@wizzup.org>
+Signed-off-by: Jagan Teki <jagan@amarulasolutions.com>
+---
+Changes for v14:
+- none
+
+ drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+index c958ca9bae63..68b88a3dc4c5 100644
+--- a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
++++ b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+@@ -1120,10 +1120,13 @@ static int sun6i_dsi_probe(struct platform_device *pdev)
+ 		return PTR_ERR(dsi->reset);
+ 	}
+ 
+-	dsi->mod_clk = devm_clk_get(dev, "mod");
+-	if (IS_ERR(dsi->mod_clk)) {
+-		dev_err(dev, "Couldn't get the DSI mod clock\n");
+-		return PTR_ERR(dsi->mod_clk);
++	if (of_device_is_compatible(dev->of_node,
++				    "allwinner,sun6i-a31-mipi-dsi")) {
++		dsi->mod_clk = devm_clk_get(dev, "mod");
++		if (IS_ERR(dsi->mod_clk)) {
++			dev_err(dev, "Couldn't get the DSI mod clock\n");
++			return PTR_ERR(dsi->mod_clk);
++		}
+ 	}
+ 
+ 	/*
+
+From patchwork Sun Dec 22 13:22:26 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Jagan Teki <jagan@amarulasolutions.com>
+X-Patchwork-Id: 11307457
+Return-Path: 
+ <SRS0=r43V=2M=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 3D81F109A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:30:39 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id 194062063A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:30:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="AFTedsv/";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=amarulasolutions.com header.i=@amarulasolutions.com
+ header.b="elp3iMXt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 194062063A
+Authentication-Results: mail.kernel.org;
+ dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=9UxXrLT0GmjyX4vuzEprGaVcQRRapLV74LP6a00tMXw=; b=AFTedsv/ovcY8k
+	TQP1PYydV4Nie/NjuSDXxUPhU9T1d90Q6p6+1qrFQO2twJxpXGtz97VCvCe+N0Jzb0TSTfG3sIeHm
+	IKfcyyRDtJTaL6iNYzzaRMDKJy/qWQzy4STQpJIeqSRJkaQTyoMdihBi6Ig4la+HwqCx6zrUzV91t
+	WDN1Uoc8gzKUwhwLBLFqPf1T56PZ9xl73p7SvNDkxX0okxcOTDUltxEFM4tVWmPnjEjlN+c3/3S2K
+	+mkYz9xO24pHTQ0UPRxsxs8nxUAmuzCwPhNJVfEfWtPn52rjNrGKx+j2wPq1XJug4gd2WWCXR2xPL
+	qLFMtF64pJD+pfHNRNvg==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92.3 #3 (Red Hat Linux))
+	id 1ij1Jd-0005TJ-RM; Sun, 22 Dec 2019 13:30:37 +0000
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641])
+ by bombadil.infradead.org with esmtps (Exim 4.92.3 #3 (Red Hat Linux))
+ id 1ij1Io-0003Zj-Jz
+ for linux-arm-kernel@lists.infradead.org; Sun, 22 Dec 2019 13:29:48 +0000
+Received: by mail-pl1-x641.google.com with SMTP id bd4so6110945plb.8
+ for <linux-arm-kernel@lists.infradead.org>;
+ Sun, 22 Dec 2019 05:29:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amarulasolutions.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=9EK74rOb2z7EDUkpcZJ+pjm2y3iAMcEo48mh6FOoxhw=;
+ b=elp3iMXtldViCwMF3JjT3bZYVczFV91HufAwoMDwVKUlMBQTJzocTtRCPkNBZMIA9g
+ 2VG1BztxAum0YPvU8OBwZOSVW5E9wgbKIBqnXdWU8ONLA/+ucglW6TcP3PR9UVYG6GNo
+ SfCb4jXdvRDs/0qiGzLsCQH00UaN3uPOVome4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=9EK74rOb2z7EDUkpcZJ+pjm2y3iAMcEo48mh6FOoxhw=;
+ b=qwMI8sbmlVrzySSZIDRgTKuUwNMO35733V5CamdqAcrZmzEC50MsJCwpDHqIM3ntax
+ HJaEmA3Bo4ARytOL+9oN2CpMws0Iq+Nnf/xHFN6T3PidplxtCF0hrdl2C5Smh+chEyph
+ 7jdbhOsY61rE36+IdT4/GpAk8vK11OiSlCcOx5qL9uSP/RK3kUz8QGVCo+UlGfZIPkF/
+ J9g63I7gs3acNRpvOy17/RtsOpcBqX3zXJeUmWoMqBsI4DbE9pMtRj7xD4E7lE99fC8t
+ p4Mql+KjVC1Ql4t7AZmRNqiXDvrvPan/9fSxK8MsftWwk+//ENpbrtWVoQs7HiP5Xdmr
+ jDkg==
+X-Gm-Message-State: APjAAAX1SbJuUnVFuUZiXg7c9oVD2Py48qAB9E6Kkmu5IbacTz12s6z9
+ 8k0f7hzsuE60sUdD3nMESmocDg==
+X-Google-Smtp-Source: 
+ APXvYqwbCvY+32jV+/QgjoePmeG6bzYo9uGs3ZgswBABaoyGH34YZ1Q2hfocbLiZGUbMXhjjrYPS2A==
+X-Received: by 2002:a17:90a:db48:: with SMTP id
+ u8mr7360374pjx.54.1577021385351;
+ Sun, 22 Dec 2019 05:29:45 -0800 (PST)
+Received: from localhost.localdomain ([49.206.202.16])
+ by smtp.gmail.com with ESMTPSA id o2sm12073058pjo.26.2019.12.22.05.29.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 22 Dec 2019 05:29:44 -0800 (PST)
+From: Jagan Teki <jagan@amarulasolutions.com>
+To: Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ David Airlie <airlied@linux.ie>, Daniel Vetter <daniel@ffwll.ch>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v14 4/7] drm/sun4i: dsi: Handle bus clock via
+ regmap_mmio_attach_clk
+Date: Sun, 22 Dec 2019 18:52:26 +0530
+Message-Id: <20191222132229.30276-5-jagan@amarulasolutions.com>
+X-Mailer: git-send-email 2.18.0.321.gffc6fa0e3
+In-Reply-To: <20191222132229.30276-1-jagan@amarulasolutions.com>
+References: <20191222132229.30276-1-jagan@amarulasolutions.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20191222_052946_667391_1102BB67 
+X-CRM114-Status: GOOD (  15.99  )
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ -0.0 RCVD_IN_DNSWL_NONE     RBL: Sender listed at https://www.dnswl.org/,
+ no trust [2607:f8b0:4864:20:0:0:0:641 listed in]
+ [list.dnswl.org]
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-sunxi <linux-sunxi@googlegroups.com>,
+ Jagan Teki <jagan@amarulasolutions.com>, michael@amarulasolutions.com,
+ linux-amarula@amarulasolutions.com, linux-arm-kernel@lists.infradead.org,
+ Icenowy Zheng <icenowy@aosc.io>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+
+regmap has special API to enable the controller bus clock while
+initializing register space, and current driver is using
+devm_regmap_init_mmio_clk which require to specify bus
+clk_id argument as "bus"
+
+But, the usage of clocks are varies between different Allwinner
+DSI controllers. Clocking in A33 would need bus and mod clocks
+where as A64 would need only bus clock.
+
+Since A64 support only single bus clock, it is optional to
+specify the clock-names on the controller device tree node.
+So using NULL on clk_id would get the attached clock.
+
+To support clk_id as "bus" and "NULL" during clock enablement
+between controllers, this patch add generic code to handle
+the bus clock using regmap_mmio_attach_clk with associated
+regmap APIs.
+
+Signed-off-by: Jagan Teki <jagan@amarulasolutions.com>
+---
+Changes for v14:
+- drop regmap_exit, clk_put
+
+ drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c | 37 ++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+index 68b88a3dc4c5..2577b237d06a 100644
+--- a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
++++ b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+@@ -1081,6 +1081,7 @@ static const struct component_ops sun6i_dsi_ops = {
+ static int sun6i_dsi_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
++	const char *bus_clk_name = NULL;
+ 	struct sun6i_dsi *dsi;
+ 	struct resource *res;
+ 	void __iomem *base;
+@@ -1094,6 +1095,10 @@ static int sun6i_dsi_probe(struct platform_device *pdev)
+ 	dsi->host.ops = &sun6i_dsi_host_ops;
+ 	dsi->host.dev = dev;
+ 
++	if (of_device_is_compatible(dev->of_node,
++				    "allwinner,sun6i-a31-mipi-dsi"))
++		bus_clk_name = "bus";
++
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	base = devm_ioremap_resource(dev, res);
+ 	if (IS_ERR(base)) {
+@@ -1107,25 +1112,35 @@ static int sun6i_dsi_probe(struct platform_device *pdev)
+ 		return PTR_ERR(dsi->regulator);
+ 	}
+ 
+-	dsi->regs = devm_regmap_init_mmio_clk(dev, "bus", base,
+-					      &sun6i_dsi_regmap_config);
+-	if (IS_ERR(dsi->regs)) {
+-		dev_err(dev, "Couldn't create the DSI encoder regmap\n");
+-		return PTR_ERR(dsi->regs);
+-	}
+-
+ 	dsi->reset = devm_reset_control_get_shared(dev, NULL);
+ 	if (IS_ERR(dsi->reset)) {
+ 		dev_err(dev, "Couldn't get our reset line\n");
+ 		return PTR_ERR(dsi->reset);
+ 	}
+ 
++	dsi->regs = devm_regmap_init_mmio(dev, base, &sun6i_dsi_regmap_config);
++	if (IS_ERR(dsi->regs)) {
++		dev_err(dev, "Couldn't init regmap\n");
++		return PTR_ERR(dsi->regs);
++	}
++
++	dsi->bus_clk = devm_clk_get(dev, bus_clk_name);
++	if (IS_ERR(dsi->bus_clk)) {
++		dev_err(dev, "Couldn't get the DSI bus clock\n");
++		return PTR_ERR(dsi->bus_clk);
++	} else {
++		ret = regmap_mmio_attach_clk(dsi->regs, dsi->bus_clk);
++		if (ret)
++			return ret;
++	}
++
+ 	if (of_device_is_compatible(dev->of_node,
+ 				    "allwinner,sun6i-a31-mipi-dsi")) {
+ 		dsi->mod_clk = devm_clk_get(dev, "mod");
+ 		if (IS_ERR(dsi->mod_clk)) {
+ 			dev_err(dev, "Couldn't get the DSI mod clock\n");
+-			return PTR_ERR(dsi->mod_clk);
++			ret = PTR_ERR(dsi->mod_clk);
++			goto err_attach_clk;
+ 		}
+ 	}
+ 
+@@ -1164,6 +1179,9 @@ static int sun6i_dsi_probe(struct platform_device *pdev)
+ 	pm_runtime_disable(dev);
+ err_unprotect_clk:
+ 	clk_rate_exclusive_put(dsi->mod_clk);
++err_attach_clk:
++	if (!IS_ERR(dsi->bus_clk))
++		regmap_mmio_detach_clk(dsi->regs);
+ 	return ret;
+ }
+ 
+@@ -1177,6 +1195,9 @@ static int sun6i_dsi_remove(struct platform_device *pdev)
+ 	pm_runtime_disable(dev);
+ 	clk_rate_exclusive_put(dsi->mod_clk);
+ 
++	if (!IS_ERR(dsi->bus_clk))
++		regmap_mmio_detach_clk(dsi->regs);
++
+ 	return 0;
+ }
+ 
+
+From patchwork Sun Dec 22 13:22:27 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Jagan Teki <jagan@amarulasolutions.com>
+X-Patchwork-Id: 11307459
+Return-Path: 
+ <SRS0=r43V=2M=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 2CF95138C
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:30:52 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AA902063A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:30:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="bHXce8QQ";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=amarulasolutions.com header.i=@amarulasolutions.com
+ header.b="I3PQ33U1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AA902063A
+Authentication-Results: mail.kernel.org;
+ dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=MpNLgwrcUWVMYEe8PcJLWKsWHQBz28rQK4Y9K+MWPO4=; b=bHXce8QQ8emnWq
+	MV9FxbyZjKpyhglwv6N3kZqT6BKI/ItxJQJ4LKVWJFqa9awFuwyGmxozNdI6E24TmcHv5qcq2/qJu
+	kkiAeuN6iF1FUDx3bGAhSwvtQBbMHbQQ8vLXPANiZeTvwBjn2FFZGi+AJ8qNY5ptI8IGkVo2qr+/4
+	bp9U+Ul0KbrhbZkPvG4Ui7o5dDM26xGcjg1v06mR3A566X2DmNBM+pEjwK3F7HXqkS3GdJG67rXod
+	ePgUbruWUYNfgz7F+IsiNHx24cOFu6riZ0k9j3zfJRMPaGRTST6nS6/HwKsw5vjl5eaMVqL/iEPU4
+	lsfnQpzXZ+AOqKDChLpQ==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92.3 #3 (Red Hat Linux))
+	id 1ij1Jq-0005iO-A0; Sun, 22 Dec 2019 13:30:50 +0000
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642])
+ by bombadil.infradead.org with esmtps (Exim 4.92.3 #3 (Red Hat Linux))
+ id 1ij1It-0003fL-C1
+ for linux-arm-kernel@lists.infradead.org; Sun, 22 Dec 2019 13:29:52 +0000
+Received: by mail-pl1-x642.google.com with SMTP id az3so6101619plb.11
+ for <linux-arm-kernel@lists.infradead.org>;
+ Sun, 22 Dec 2019 05:29:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amarulasolutions.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ZXOcwXSpTDZpb+/TcTbfTiplV6hYObjzRW1vf2xFZRA=;
+ b=I3PQ33U14EAolLLj8jlrmUJ/O9DIkC6SXNrRVAoW9isHRRLbh0z685MsUAAtjr60en
+ UzggneMmXWh6Sdorq0YMf2qD+5Zi4RnYC350HCHCRJPy4evKsI1sZcsdE2rXY2dTYvT7
+ 1PQ9gScLj5oAiJ/wwt8CJTwOu416Ss5/Im9YE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ZXOcwXSpTDZpb+/TcTbfTiplV6hYObjzRW1vf2xFZRA=;
+ b=TqMjqXPfb72mAtvYLp4zmhSbyzQDnIuVSrwkGBjiqS4EdYjCQX+G9q578kDR5z59wF
+ NNkujZbB9N8RyTXuhga405iuwIJSlm4nh5TfPKTH+SLyNqZdu8oJsQb7eDmJfAkCP7cN
+ yUw8ujM5fchseCqE8FZ2t5wBysnVgaUvgJJ6jOhvocPPtpowDlGqKZQPwMLn4hQ7GYNi
+ 4kKmF+JnpXS4M/FbMp8NL3EZ6qDcCU7dTS9gEc8S/Ip45TNypPTgXdXBoFnhEcMIweg+
+ kZLiVFCmB8WXPjStYOFIga0fxTj/OeWHJm+7aHMCuRcjiedcLokBf7Amy0vhl9+siHJN
+ wOjg==
+X-Gm-Message-State: APjAAAWc/c6XCruWsNiJQYlB+eHsqeHxxblmYCfsWpL9ZXNO6YQHjqPB
+ hH5fT27TSWrRrYmPzCA9keCNUw==
+X-Google-Smtp-Source: 
+ APXvYqyIL1psXc/olK/QSRgQqBxtxjvsmTJrG5PZsaaCso/VKkCbYbl+cm8ubF+spBhD1JmKttrayw==
+X-Received: by 2002:a17:902:48:: with SMTP id
+ 66mr25655198pla.182.1577021390160;
+ Sun, 22 Dec 2019 05:29:50 -0800 (PST)
+Received: from localhost.localdomain ([49.206.202.16])
+ by smtp.gmail.com with ESMTPSA id o2sm12073058pjo.26.2019.12.22.05.29.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 22 Dec 2019 05:29:49 -0800 (PST)
+From: Jagan Teki <jagan@amarulasolutions.com>
+To: Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ David Airlie <airlied@linux.ie>, Daniel Vetter <daniel@ffwll.ch>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v14 5/7] drm/sun4i: dsi: Add Allwinner A64 MIPI DSI support
+Date: Sun, 22 Dec 2019 18:52:27 +0530
+Message-Id: <20191222132229.30276-6-jagan@amarulasolutions.com>
+X-Mailer: git-send-email 2.18.0.321.gffc6fa0e3
+In-Reply-To: <20191222132229.30276-1-jagan@amarulasolutions.com>
+References: <20191222132229.30276-1-jagan@amarulasolutions.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20191222_052951_416139_81C20CF2 
+X-CRM114-Status: GOOD (  10.78  )
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ -0.0 RCVD_IN_DNSWL_NONE     RBL: Sender listed at https://www.dnswl.org/,
+ no trust [2607:f8b0:4864:20:0:0:0:642 listed in]
+ [list.dnswl.org]
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-sunxi <linux-sunxi@googlegroups.com>,
+ Jagan Teki <jagan@amarulasolutions.com>, michael@amarulasolutions.com,
+ linux-amarula@amarulasolutions.com, linux-arm-kernel@lists.infradead.org,
+ Icenowy Zheng <icenowy@aosc.io>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+
+The MIPI DSI controller in Allwinner A64 is similar to A33.
+
+But unlike A33, A64 doesn't have DSI_SCLK gating so add compatible
+for Allwinner A64 with uninitialized has_mod_clk driver.
+
+Signed-off-by: Jagan Teki <jagan@amarulasolutions.com>
+Tested-by: Merlijn Wajer <merlijn@wizzup.org>
+---
+Changes for v14:
+- none
+
+ drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+index 2577b237d06a..4a024951aa11 100644
+--- a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
++++ b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+@@ -1256,6 +1256,7 @@ static const struct dev_pm_ops sun6i_dsi_pm_ops = {
+ 
+ static const struct of_device_id sun6i_dsi_of_table[] = {
+ 	{ .compatible = "allwinner,sun6i-a31-mipi-dsi" },
++	{ .compatible = "allwinner,sun50i-a64-mipi-dsi" },
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, sun6i_dsi_of_table);
+
+From patchwork Sun Dec 22 13:22:28 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Jagan Teki <jagan@amarulasolutions.com>
+X-Patchwork-Id: 11307461
+Return-Path: 
+ <SRS0=r43V=2M=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 4CC80109A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:31:05 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A80C2063A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:31:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="Wbq3nQ1Q";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=amarulasolutions.com header.i=@amarulasolutions.com
+ header.b="aN/z+SvO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A80C2063A
+Authentication-Results: mail.kernel.org;
+ dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=+07zi0A4n4yyTAkcr3ssW0RgOtq7AQ+c3wetVEvHj7c=; b=Wbq3nQ1QaaaYk4
+	TN2nN9j4nK/oDag/uN+tIaIQ4OJY+IU0vOrQNb9AMtoGIBhgLX8kf5i4Ljnl0ZLbJWRqc4ry6a5i/
+	/PGLoZlFZv0aVDdo/Ev/7riFniDJFFTJ7ctDT8m3LyaRwq/rZCSHmkmZRMyxt33+6k8AhTSqZetT1
+	1zqerPmi9DhdFw91yy4wmEFPjJkcDpc9njX1anzV/+9XNysp94OjMQoWWGaXwxzt9Q/Na8iIHK/MK
+	uash8Aes/nxOerM3pwGmwHNinIQjlj9DUvh/T1UAlIcHKCB7McgXBTFdU0ngFlDiVitzc6EcsMsAm
+	N+tmBv3znsLTbYnpLx3Q==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92.3 #3 (Red Hat Linux))
+	id 1ij1K2-0005x5-P7; Sun, 22 Dec 2019 13:31:02 +0000
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544])
+ by bombadil.infradead.org with esmtps (Exim 4.92.3 #3 (Red Hat Linux))
+ id 1ij1Iz-0003kR-3I
+ for linux-arm-kernel@lists.infradead.org; Sun, 22 Dec 2019 13:29:59 +0000
+Received: by mail-pg1-x544.google.com with SMTP id k25so7424080pgt.7
+ for <linux-arm-kernel@lists.infradead.org>;
+ Sun, 22 Dec 2019 05:29:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amarulasolutions.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=xq2qov66+ZKQzbRfM2Ia41hD0OqHDHdZrt8IUGMciys=;
+ b=aN/z+SvOEIOG7pKfL3EAs/o2YJxa4fGDyhDurxf9BFee4oUQOYmh5YDzvcR0++/wgO
+ /UTCY/yccmcyFCUrb3G+F+ufbTU4HXVCd7avRL5pQXSUmTfQVhcoU3sY2/gnEzWFBgd2
+ V4V2g8nvEvUnNSKNJoHUWTG97hocXPGtyNhps=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=xq2qov66+ZKQzbRfM2Ia41hD0OqHDHdZrt8IUGMciys=;
+ b=HujP2UF+qSRQ6Hl/vuGCfMZvfESwjJVerSH19LL8WSkoUoet+hCgHjaI5WAgKucl5s
+ +nUfHO1mC4aQQPAdclgO2Q5xRsQCpzEMkgpWGXwkbFcRjFcK1Zq0Bqi+9T0ZqRG0tGh4
+ 7TxMGHWCjf8Ngw2sb3xW12bM0fQnVH1h2dxtwweKzOoxOClxt4YBLGdbCOObbuyke6Yh
+ 1gVQq8ylFnFtFfZNuRWbTVehEmL5kLthvN2a653Q6TCQrv86aJ1s27cFj6Cc+K39eYuZ
+ boshX8CUO4hUJazLi9ah2VlzY31LPjQuEzCppBvJ9vaSoignSUcoUjRGb6nMZCWzPxpN
+ ApUA==
+X-Gm-Message-State: APjAAAXojTe5LXcLryvxdtT+HEiSKQSZ/6nwDl07cLQCZE1VEKyIeTCi
+ H0XhIcJWSrVwnVKwJbAqFmHCkQ==
+X-Google-Smtp-Source: 
+ APXvYqxHOIWV1QpzQpqIk+oG3B9jfIK2/Lz4J3qY5Xg5MsBrwBHFlLSPubYChCJEMqxNWmsb1jEwpA==
+X-Received: by 2002:a63:e911:: with SMTP id i17mr26186191pgh.42.1577021395126;
+ Sun, 22 Dec 2019 05:29:55 -0800 (PST)
+Received: from localhost.localdomain ([49.206.202.16])
+ by smtp.gmail.com with ESMTPSA id o2sm12073058pjo.26.2019.12.22.05.29.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 22 Dec 2019 05:29:54 -0800 (PST)
+From: Jagan Teki <jagan@amarulasolutions.com>
+To: Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ David Airlie <airlied@linux.ie>, Daniel Vetter <daniel@ffwll.ch>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v14 6/7] arm64: dts: allwinner: a64: Add MIPI DSI pipeline
+Date: Sun, 22 Dec 2019 18:52:28 +0530
+Message-Id: <20191222132229.30276-7-jagan@amarulasolutions.com>
+X-Mailer: git-send-email 2.18.0.321.gffc6fa0e3
+In-Reply-To: <20191222132229.30276-1-jagan@amarulasolutions.com>
+References: <20191222132229.30276-1-jagan@amarulasolutions.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20191222_052957_194517_A2177806 
+X-CRM114-Status: GOOD (  11.22  )
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ -0.0 RCVD_IN_DNSWL_NONE     RBL: Sender listed at https://www.dnswl.org/,
+ no trust [2607:f8b0:4864:20:0:0:0:544 listed in]
+ [list.dnswl.org]
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-sunxi <linux-sunxi@googlegroups.com>,
+ Jagan Teki <jagan@amarulasolutions.com>, michael@amarulasolutions.com,
+ linux-amarula@amarulasolutions.com, linux-arm-kernel@lists.infradead.org,
+ Icenowy Zheng <icenowy@aosc.io>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+
+Add MIPI DSI pipeline for Allwinner A64.
+
+- dsi node, with A64 compatible since it doesn't support
+  DSI_SCLK gating unlike A33
+- dphy node, with A64 compatible with A33 fallback since
+  DPHY on A64 and A33 is similar
+- finally, attach the dsi_in to tcon0 for complete MIPI DSI
+
+Signed-off-by: Jagan Teki <jagan@amarulasolutions.com>
+Tested-by: Merlijn Wajer <merlijn@wizzup.org>
+---
+Changes for v14:
+- none
+
+ arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi | 37 +++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+index 27e48234f1c2..1db8378f59a4 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+@@ -382,6 +382,12 @@
+ 					#address-cells = <1>;
+ 					#size-cells = <0>;
+ 					reg = <1>;
++
++					tcon0_out_dsi: endpoint@1 {
++						reg = <1>;
++						remote-endpoint = <&dsi_in_tcon0>;
++						allwinner,tcon-channel = <1>;
++					};
+ 				};
+ 			};
+ 		};
+@@ -1014,6 +1020,37 @@
+ 			status = "disabled";
+ 		};
+ 
++		dsi: dsi@1ca0000 {
++			compatible = "allwinner,sun50i-a64-mipi-dsi";
++			reg = <0x01ca0000 0x1000>;
++			interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ccu CLK_BUS_MIPI_DSI>;
++			resets = <&ccu RST_BUS_MIPI_DSI>;
++			phys = <&dphy>;
++			phy-names = "dphy";
++			status = "disabled";
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port {
++				dsi_in_tcon0: endpoint {
++					remote-endpoint = <&tcon0_out_dsi>;
++				};
++			};
++		};
++
++		dphy: d-phy@1ca1000 {
++			compatible = "allwinner,sun50i-a64-mipi-dphy",
++				     "allwinner,sun6i-a31-mipi-dphy";
++			reg = <0x01ca1000 0x1000>;
++			clocks = <&ccu CLK_BUS_MIPI_DSI>,
++				 <&ccu CLK_DSI_DPHY>;
++			clock-names = "bus", "mod";
++			resets = <&ccu RST_BUS_MIPI_DSI>;
++			status = "disabled";
++			#phy-cells = <0>;
++		};
++
+ 		hdmi: hdmi@1ee0000 {
+ 			compatible = "allwinner,sun50i-a64-dw-hdmi",
+ 				     "allwinner,sun8i-a83t-dw-hdmi";
+
+From patchwork Sun Dec 22 13:22:29 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Jagan Teki <jagan@amarulasolutions.com>
+X-Patchwork-Id: 11307463
+Return-Path: 
+ <SRS0=r43V=2M=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id EDD4A109A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:31:21 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id B1A1C2063A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun, 22 Dec 2019 13:31:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="cLv8Gh/y";
+	dkim=fail reason="signature verification failed" (1024-bit key)
+ header.d=amarulasolutions.com header.i=@amarulasolutions.com
+ header.b="Ko7Ge9z6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1A1C2063A
+Authentication-Results: mail.kernel.org;
+ dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=MbG1mxHhshbFnCed8feO4oZbMmwfJoPgg2V+haohVk4=; b=cLv8Gh/ymO212f
+	/YfTdPmGVhI5hoq91HvrqDx3yKffC9BX/j3/zXJI++Zo2Kx56P4WdU2HLTTfPYDp04mdM9eMOgw3y
+	RKFWf3mV2fq305W4RoHX/4UT2cnXb3bufKhy36Tkee+wzhV4upjGoSwd5oEU92Xu2rJbo1nL5TXZf
+	mFNOxFfERJaODqeWtfbeh80ZuE8J03Ta1w11zWJYKOcmAlm4OrSOfaKIGLqIcXt+PCLO9msepUA1i
+	4Vqzz32XAgOd1YfmAxV6XuT/CErN5i28ANFlxJSQjrEdTKPsBpDjGA9BSfal0JgCpy3+Wrtll9T7F
+	eGJJ0oR6C6N+xUTcMIjA==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92.3 #3 (Red Hat Linux))
+	id 1ij1KJ-0006E0-Ol; Sun, 22 Dec 2019 13:31:19 +0000
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544])
+ by bombadil.infradead.org with esmtps (Exim 4.92.3 #3 (Red Hat Linux))
+ id 1ij1J3-0003ow-35
+ for linux-arm-kernel@lists.infradead.org; Sun, 22 Dec 2019 13:30:02 +0000
+Received: by mail-pg1-x544.google.com with SMTP id s64so7422052pgb.9
+ for <linux-arm-kernel@lists.infradead.org>;
+ Sun, 22 Dec 2019 05:30:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amarulasolutions.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=mkXpYcbeC0bnNO0q+6BYbbUdKRmj3eZu6k2PkyZZ+20=;
+ b=Ko7Ge9z6rEc/DNmA95FoqQhmD4ZRDMPPBvY192RjylPy6mpEnDYy49s6Gs0N/4z2kS
+ T0nAmsWgfOGv42sGav/y+PMu+c2uzyw9DWV3Oeh7UpIBgQY7ACvqC80JS6JoZL9MGDR3
+ vFWd3oxz+DYWwGFdxlws9nHlwBEx04TuiX6rY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=mkXpYcbeC0bnNO0q+6BYbbUdKRmj3eZu6k2PkyZZ+20=;
+ b=BIe9oexstyyHbrl384pA8tZt6/plLJbwgqEpQQEkqESCXxdZ+dkvtlncUClMJVI43N
+ LGtIK+wRX3cqQW1yizlg9ate8NsiBw5ycKnRjIvTkbvSyzmjnQgpAoqBqCB3trPWWAVu
+ zHwtDM3Pp9FAvi55id4CLB5/uTsNNOnpmbZfb0o34JPFFnbNkpHDxAau5/x/KSderxda
+ Ez83JHSDodDBBKpE67sCPMsujba8Pa1GbfCONquVpdjjq66q0NEAl7U424BPm8fI9jgj
+ ZtM+IbUxOzZUeEKfS4ryVdUQ4Kunl2jkpvLYAVZGjjEnJBgJCHsvtAB99AVLgE1yuLuO
+ Dbhg==
+X-Gm-Message-State: APjAAAXCvXcaCaT1qmCr7e5Pzk/fYcPkQrLDqVxMmgDwdEr1k5ywnkJU
+ GgAfX26JXg/AIAeIWE0NRNsYkA==
+X-Google-Smtp-Source: 
+ APXvYqyHkanj7JlhaLM0WTdhZMkadXcPfBdMYpNMuwK5QyAWQ/FBBL4mGlVa76wmMBcDwSTcOZH+Ag==
+X-Received: by 2002:a63:201d:: with SMTP id
+ g29mr26867710pgg.427.1577021399945;
+ Sun, 22 Dec 2019 05:29:59 -0800 (PST)
+Received: from localhost.localdomain ([49.206.202.16])
+ by smtp.gmail.com with ESMTPSA id o2sm12073058pjo.26.2019.12.22.05.29.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 22 Dec 2019 05:29:59 -0800 (PST)
+From: Jagan Teki <jagan@amarulasolutions.com>
+To: Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ David Airlie <airlied@linux.ie>, Daniel Vetter <daniel@ffwll.ch>,
+ Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [DO NOT MERGE] [PATCH v14 7/7] arm64: dts: allwinner: bananapi-m64:
+ Enable Bananapi S070WV20-CT16 DSI panel
+Date: Sun, 22 Dec 2019 18:52:29 +0530
+Message-Id: <20191222132229.30276-8-jagan@amarulasolutions.com>
+X-Mailer: git-send-email 2.18.0.321.gffc6fa0e3
+In-Reply-To: <20191222132229.30276-1-jagan@amarulasolutions.com>
+References: <20191222132229.30276-1-jagan@amarulasolutions.com>
+MIME-Version: 1.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20191222_053001_164386_57CF6E03 
+X-CRM114-Status: GOOD (  11.99  )
+X-Spam-Score: -0.2 (/)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-0.2 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ -0.0 RCVD_IN_DNSWL_NONE     RBL: Sender listed at https://www.dnswl.org/,
+ no trust [2607:f8b0:4864:20:0:0:0:544 listed in]
+ [list.dnswl.org]
+ 0.0 SPF_HELO_NONE          SPF: HELO does not publish an SPF Record
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+ envelope-from domain
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+ author's domain
+ 0.1 DKIM_SIGNED            Message has a DKIM or DK signature,
+ not necessarily
+ valid
+ -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-sunxi <linux-sunxi@googlegroups.com>,
+ Jagan Teki <jagan@amarulasolutions.com>, michael@amarulasolutions.com,
+ linux-amarula@amarulasolutions.com, linux-arm-kernel@lists.infradead.org,
+ Icenowy Zheng <icenowy@aosc.io>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+
+This patch add support for Bananapi S070WV20-CT16 DSI panel to
+BPI-M64 board.
+
+DSI panel connected via board DSI port with,
+- DLDO1 as VCC-DSI supply
+- DCDC1 as VDD supply
+- PD7 gpio for lcd enable pin
+- PD6 gpio for lcd reset pin
+- PD5 gpio for backlight enable pin
+
+Signed-off-by: Jagan Teki <jagan@amarulasolutions.com>
+---
+ .../dts/allwinner/sun50i-a64-bananapi-m64.dts | 31 +++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-bananapi-m64.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-bananapi-m64.dts
+index 208373efee49..6beaecdd802a 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-bananapi-m64.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-bananapi-m64.dts
+@@ -45,6 +45,7 @@
+ #include "sun50i-a64.dtsi"
+ 
+ #include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/pwm/pwm.h>
+ 
+ / {
+ 	model = "BananaPi-M64";
+@@ -56,6 +57,14 @@
+ 		serial1 = &uart1;
+ 	};
+ 
++	backlight: backlight {
++		compatible = "pwm-backlight";
++		pwms = <&r_pwm 0 50000 PWM_POLARITY_INVERTED>;
++		brightness-levels = <1 2 4 8 16 32 64 128 255>;
++		default-brightness-level = <2>;
++		enable-gpios = <&pio 3 5 GPIO_ACTIVE_HIGH>; /* LCD-BL-EN: PD5 */
++	};
++
+ 	chosen {
+ 		stdout-path = "serial0:115200n8";
+ 	};
+@@ -116,6 +125,24 @@
+ 	status = "okay";
+ };
+ 
++&dphy {
++	status = "okay";
++};
++
++&dsi {
++	vcc-dsi-supply = <&reg_dldo1>;		/* VCC3V3-DSI */
++	status = "okay";
++
++	panel@0 {
++		compatible = "bananapi,s070wv20-ct16-icn6211";
++		reg = <0>;
++		enable-gpios = <&pio 3 7 GPIO_ACTIVE_HIGH>; /* LCD-PWR-EN: PD7 */
++		reset-gpios = <&pio 3 6 GPIO_ACTIVE_HIGH>; /* LCD-RST: PD6 */
++		vdd-supply = <&reg_dcdc1>;
++		backlight = <&backlight>;
++	};
++};
++
+ &ehci0 {
+ 	status = "okay";
+ };
+@@ -206,6 +233,10 @@
+ 	status = "okay";
+ };
+ 
++&r_pwm {
++	status = "okay";
++};
++
+ &r_rsb {
+ 	status = "okay";
+ 
