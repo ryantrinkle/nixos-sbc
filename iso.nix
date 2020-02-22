@@ -7,4 +7,4 @@ let
     inherit system configuration;
   };
 
-in (evalNixos ./aarch64-linux.nix).config.system.build.sdImage
+in (evalNixos ./configuration.nix).config.system.build.sdImage
