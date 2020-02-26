@@ -36,7 +36,7 @@ GEM
     mime-types-data (3.2019.1009)
     mini_portile2 (2.4.0)
     mustache (0.99.8)
-    nokogiri (1.10.7)
+    nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     posix-spawn (0.3.13)
     rack (1.6.12)
