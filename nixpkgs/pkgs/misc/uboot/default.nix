@@ -4,7 +4,7 @@
 }:
 
 let
-  buildUBoot = { version ? "2019.04"
+  buildUBoot = { version ? "2020.01"
             , filesToInstall
             , installDir ? "$out"
             , defconfig
@@ -20,15 +20,10 @@ let
 
     src = fetchurl {
       url = "ftp://ftp.denx.de/pub/u-boot/u-boot-${version}.tar.bz2";
-      sha256 = "1vwv4bgbl7fjcm073zrphn17hnz5h5h778f88ivdsgbb2lnpgdvn";
+      sha256 = "1w9ml4jl15q6ixpdqzspxjnl7d3rgxd7f99ms1xv5c8869h3qida";
     };
 
-    patches = [
-      (fetchpatch {
-        url = https://github.com/dezgeg/u-boot/commit/extlinux-path-length-2018-03.patch;
-        sha256 = "07jafdnxvqv8lz256qy29agjc2k1zj5ad4k28r1w5qkhwj4ixmf8";
-      })
-    ] ++ extraPatches;
+    patches = extraPatches;
 
     postPatch = ''
       patchShebangs tools
@@ -248,6 +243,12 @@ in {
   ubootRaspberryPiZero = buildUBoot {
     defconfig = "rpi_0_w_defconfig";
     extraMeta.platforms = ["armv6l-linux"];
+    filesToInstall = ["u-boot.bin"];
+  };
+
+  ubootRaspberryPi4_64bit = buildUBoot {
+    defconfig = "rpi_4_defconfig";
+    extraMeta.platforms = ["aarch64-linux"];
     filesToInstall = ["u-boot.bin"];
   };
 
