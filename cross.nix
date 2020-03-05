@@ -1,7 +1,7 @@
 { lib, ... }:
 with lib;
 {
-  nixpkgs.crossSystem.system = "aarch64-linux";
+  nixpkgs.crossSystem.system = "armv6l-linux";
 
   # There's a problem running fc-cache
   environment.noXlibs = mkDefault true;

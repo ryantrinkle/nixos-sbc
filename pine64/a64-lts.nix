@@ -26,8 +26,8 @@ in
       '';
       in ''
         (cd ${pkgs.raspberrypifw}/share/raspberrypi/boot && cp bootcode.bin fixup*.dat start*.elf $NIX_BUILD_TOP/firmware/)
-        cp ${pkgs.ubootRaspberryPi4_64bit}/u-boot.bin firmware/u-boot-rpi0.bin
-        cp ${pkgs.ubootRaspberryPi4_64bit}/u-boot.bin firmware/u-boot-rpi1.bin
+        cp ${pkgs.ubootRaspberryPiZero}/u-boot.bin firmware/u-boot-rpi0.bin
+        cp ${pkgs.ubootRaspberryPiZero}/u-boot.bin firmware/u-boot-rpi1.bin
         cp ${configTxt} firmware/config.txt
       '';
     populateRootCommands = ''
