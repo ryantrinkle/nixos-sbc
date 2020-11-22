@@ -1,0 +1,8 @@
+{
+  "url": "ssh://git@gitlab.com/pine64-org/linux",
+  "rev": "da1a1dee4471aa5da391517c4af40d2c80fe828d",
+  "sha256": "0ybi70aapnw07s9s8bw5bjc2dpl7fas1vfamxs80d45lnr7kmdb3",
+  "private": false,
+  "fetchSubmodules": false,
+  "branch": "pine64-kernel-5.9.y"
+}

@@ -1,0 +1,13 @@
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+index 651ec4919bec..12a00cd97444 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+@@ -86,7 +86,7 @@ &ehci1 {
+ &emac {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&rgmii_pins>;
+-	phy-mode = "rgmii";
++	phy-mode = "rgmii-txid";
+ 	phy-handle = <&ext_rgmii_phy>;
+ 	phy-supply = <&reg_dc1sw>;
+ 	status = "okay";

@@ -2,13 +2,13 @@
 { config, pkgs, ... }:
 let
   extlinux-conf-builder =
-    import ../nixpkgs/nixos/modules/system/boot/loader/generic-extlinux-compatible/extlinux-conf-builder.nix {
+    import <nixpkgs/nixos/modules/system/boot/loader/generic-extlinux-compatible/extlinux-conf-builder.nix> {
       pkgs = pkgs.buildPackages;
     };
 in
 {
   imports = [
-    ../nixpkgs/nixos/modules/installer/cd-dvd/sd-image.nix
+    <nixpkgs/nixos/modules/installer/cd-dvd/sd-image.nix>
   ];
 
   sdImage = {
@@ -39,22 +39,14 @@ in
   };
 
   nixpkgs.overlays = [(self: super: {
-    # Does not cross-compile...
-    alsa-firmware = pkgs.runCommandNoCC "neutered-firmware" {} "mkdir -p $out";
-  }) (self: super: {
-    linux_5_5 = super.linux_latest.override {
+    linux_5_9 = super.linux_latest.override {
       argsOverride = rec {
-        src = self.fetchFromGitHub {
-          owner = "torvalds";
-          repo = "linux";
-          rev = "46cf053efec6a3a5f343fead837777efe8252a46";
-          sha256 = "1fpqxc42bvmlrjn5xbyj7xiy1xni3gsaxlsdzhmkk4x0whba1h6m";
-        };
-        version = "5.5.0-rc3";
+        src = import ./linux/thunk.nix;
+        version = "5.9.1";
         modDirVersion = version;
       };
     };
-    linuxPackages_5_5 = self.linuxPackagesFor self.linux_5_5;
+    linuxPackages_5_9 = self.linuxPackagesFor self.linux_5_9;
   })];
 
   boot.initrd.availableKernelModules = [
@@ -64,16 +56,16 @@ in
     "sun4i_drm" "sun8i_drm_hdmi" "sun8i_mixer"
   ];
 
-  boot.kernelPackages = pkgs.linuxPackages_5_5;
+  boot.kernelPackages = pkgs.linuxPackages_5_9;
   boot.kernelPatches = [
-    { name = "display";
-      patch = ./drm-sun4i-Allwinner-A64-MIPI-DSI-support.patch;
+    { name = "fix-ethernet";
+      patch = ./fix-ethernet.patch;
     }
-    { name = "panel";
-      patch = ./DO-NOT-MERGE-v9-8-9-arm64-dts-allwinner-a64-pine64-lts-Enable-Feiyang-FY07024DI26A30-D-DSI-panel.patch;
+    { name = "enable-lcd";
+      patch = ./enable-lcd.patch;
     }
-    { name = "touch";
-      patch = ./enable-touchscreen.patch;
+    { name = "disable-mmc-ddr";
+      patch = ./disable-mmc-ddr.patch;
     }
   ];
 }

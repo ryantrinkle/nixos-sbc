@@ -1,0 +1,248 @@
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+index 651ec4919bec..fba509531f4c 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+@@ -9,6 +9,8 @@
+ 
+ #include <dt-bindings/gpio/gpio.h>
+ 
++#include <dt-bindings/pwm/pwm.h>
++
+ / {
+ 	model = "SoPine with baseboard";
+ 	compatible = "pine64,sopine-baseboard", "pine64,sopine",
+@@ -23,6 +25,15 @@ aliases {
+ 		serial4 = &uart4;
+ 	};
+ 
++	backlight: backlight {
++		compatible = "pwm-backlight";
++		pwms = <&r_pwm 0 50000 PWM_POLARITY_INVERTED>;
++		brightness-levels = <0 10 20 30 40 50 60 70 80 90 100>;
++		default-brightness-level = <8>;
++		enable-gpios = <&pio 7 10 GPIO_ACTIVE_HIGH>; /* PH10 */
++		power-supply = <&vdd_bl>;
++	};
++
+ 	chosen {
+ 		stdout-path = "serial0:115200n8";
+ 	};
+@@ -49,6 +60,15 @@ wifi_pwrseq: wifi_pwrseq {
+ 		compatible = "mmc-pwrseq-simple";
+ 		reset-gpios = <&r_pio 0 2 GPIO_ACTIVE_LOW>; /* PL2 */
+ 	};
++
++	vdd_bl: regulator@0 {
++		compatible = "regulator-fixed";
++		regulator-name = "bl-3v3";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpio = <&pio 7 6 GPIO_ACTIVE_HIGH>; /* PH6 */
++		enable-active-high;
++	};
+ };
+ 
+ &ac_power_supply {
+@@ -67,6 +87,10 @@ &codec_analog {
+ 	status = "okay";
+ };
+ 
++&cpu0 {
++	cpu-supply = <&reg_dcdc2>;
++};
++
+ &dai {
+ 	status = "okay";
+ };
+@@ -75,6 +99,27 @@ &de {
+ 	status = "okay";
+ };
+ 
++&dphy {
++	status = "okay";
++};
++
++&dsi {
++	vcc-dsi-supply = <&reg_dldo1>;
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	panel@0 {
++/*		compatible = "feixin,k101-im2ba02";*/
++		compatible = "feiyang,fy07024di26a30d";
++		reg = <0>;
++		avdd-supply = <&reg_dc1sw>;
++		dvdd-supply = <&reg_dldo2>;
++		reset-gpios = <&pio 3 24 GPIO_ACTIVE_HIGH>; /* PD24 */
++		backlight = <&backlight>;
++	};
++};
++
+ &ehci0 {
+ 	status = "okay";
+ };
+@@ -103,6 +148,20 @@ hdmi_out_con: endpoint {
+ 	};
+ };
+ 
++&i2c0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c0_pins>;
++	status = "okay";
++
++	touchscreen@5d {
++		compatible = "goodix,gt9271";
++		reg = <0x5d>;
++		interrupt-parent = <&pio>;
++		interrupts = <7 4 IRQ_TYPE_LEVEL_HIGH>; /* PH4 */
++		reset-gpios = <&pio 7 8 IRQ_TYPE_LEVEL_HIGH>; /* PH8 */
++	};
++};
++
+ &mdio {
+ 	ext_rgmii_phy: ethernet-phy@1 {
+ 		compatible = "ethernet-phy-ieee802.3-c22";
+@@ -140,14 +199,64 @@ &ohci1 {
+ 	status = "okay";
+ };
+ 
++&r_pwm {
++	pinctrl-names = "default";
++	pinctrl-0 = <&r_pwm_pin>;
++	status = "okay";
++};
++
++&reg_aldo1 {
++	regulator-min-microvolt = <2800000>;
++	regulator-max-microvolt = <2800000>;
++	regulator-name = "dovdd-csi";
++};
++
++&reg_aldo2 {
++	regulator-always-on;
++	regulator-min-microvolt = <1800000>;
++	regulator-max-microvolt = <3300000>;
++	regulator-name = "vcc-pl";
++};
++
++&reg_aldo3 {
++	regulator-always-on;
++	regulator-min-microvolt = <2700000>;
++	regulator-max-microvolt = <3300000>;
++	regulator-name = "vcc-pll-avcc";
++};
++
+ &reg_dc1sw {
+-	/*
+-	 * Ethernet PHY needs 30ms to properly power up and some more
+-	 * to initialize. 100ms should be plenty of time to finish
+-	 * whole process.
+-	 */
+-	regulator-enable-ramp-delay = <100000>;
+-	regulator-name = "vcc-phy";
++	regulator-name = "vcc-lcd";
++};
++
++&reg_dcdc1 {
++	regulator-always-on;
++	regulator-min-microvolt = <3300000>;
++	regulator-max-microvolt = <3300000>;
++	regulator-name = "vcc-3v3";
++};
++
++&reg_dcdc2 {
++	regulator-always-on;
++	regulator-min-microvolt = <1000000>;
++	regulator-max-microvolt = <1300000>;
++	regulator-name = "vdd-cpux";
++};
++
++/* DCDC3 is polyphased with DCDC2 */
++
++&reg_dcdc5 {
++	regulator-always-on;
++	regulator-min-microvolt = <1200000>;
++	regulator-max-microvolt = <1200000>;
++	regulator-name = "vcc-dram";
++};
++
++&reg_dcdc6 {
++	regulator-always-on;
++	regulator-min-microvolt = <1100000>;
++	regulator-max-microvolt = <1100000>;
++	regulator-name = "vdd-sys";
+ };
+ 
+ &reg_dldo1 {
+@@ -162,12 +271,70 @@ &reg_dldo2 {
+ 	regulator-name = "vcc-mipi";
+ };
+ 
++&reg_dldo3 {
++	regulator-min-microvolt = <2800000>;
++	regulator-max-microvolt = <2800000>;
++	regulator-name = "avdd-csi";
++};
++
+ &reg_dldo4 {
+ 	regulator-min-microvolt = <3300000>;
+ 	regulator-max-microvolt = <3300000>;
+ 	regulator-name = "vcc-wifi";
+ };
+ 
++&reg_drivevbus {
++	regulator-name = "usb0-vbus";
++	status = "okay";
++};
++
++&reg_eldo1 {
++	regulator-always-on;
++	regulator-min-microvolt = <1800000>;
++	regulator-max-microvolt = <1800000>;
++	regulator-name = "cpvdd";
++};
++
++&reg_eldo2 {
++	regulator-min-microvolt = <1800000>;
++	regulator-max-microvolt = <1800000>;
++	regulator-name = "vcca-1v8";
++};
++
++&reg_eldo3 {
++	regulator-min-microvolt = <1800000>;
++	regulator-max-microvolt = <1800000>;
++	regulator-name = "dvdd-1v8-csi";
++};
++
++&reg_fldo1 {
++	regulator-min-microvolt = <1200000>;
++	regulator-max-microvolt = <1200000>;
++	regulator-name = "vcc-1v2-hsic";
++};
++
++&reg_fldo2 {
++	regulator-always-on;
++	regulator-min-microvolt = <1100000>;
++	regulator-max-microvolt = <1100000>;
++	regulator-name = "vdd-cpus";
++};
++
++&reg_ldo_io0 {
++	regulator-min-microvolt = <3300000>;
++	regulator-max-microvolt = <3300000>;
++	regulator-name = "vcc-usb";
++	status = "okay";
++};
++
++&reg_ldo_io1 {
++	regulator-always-on;
++	regulator-min-microvolt = <3300000>;
++	regulator-max-microvolt = <3300000>;
++	regulator-name = "vcc-touchscreen";
++	status = "okay";
++};
++
+ &simplefb_hdmi {
+ 	vcc-hdmi-supply = <&reg_dldo1>;
+ };

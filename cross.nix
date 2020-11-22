@@ -14,4 +14,9 @@ with lib;
   # cifs-utils fails to cross-compile
   # Let's simplify this by removing all unneeded filesystems from the image.
   boot.supportedFilesystems = mkForce [ "vfat" ];
+
+  nixpkgs.overlays = [(self: super: {
+    # Does not cross-compile...
+    alsa-firmware = pkgs.runCommandNoCC "neutered-firmware" {} "mkdir -p $out";
+  })];
 }
